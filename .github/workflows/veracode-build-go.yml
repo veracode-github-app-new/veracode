@@ -43,15 +43,17 @@ jobs:
           export GOPATH=`go env GOPATH` &&
           export PATH="$GOPATH/bin:$PATH" && go install github.com/relaxnow/vcgopkg@latest
 
-      - name: Initialize and tidy go mod
+      - name: Initialize and figure out packages
         run: |
           if [[ "${{ steps.check-go-mod.outputs.go_mod_exists }}" == "false" ]]; then
             go mod init github.com/${{ inputs.repository }}
+            go mod download
             go mod tidy
+            go mod vendor
           fi
 
-      - name: Run vcgopkg
-        run: vcgopkg
+      - name: Run build
+        run: go build -o "kbveracode"
         
       - uses: actions/upload-artifact@v3
         with:
